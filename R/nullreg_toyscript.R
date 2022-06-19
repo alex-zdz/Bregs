@@ -38,7 +38,9 @@ verbose=TRUE
 
 
 
-
-#@import
-#'importFrom("stats", "glm", "rgamma", "rnorm", "sd")
-#'importFrom("utils", "txtProgressBar")
+mu <- 5
+sig2 <- 2
+set.seed(28)
+y <- rnorm(110,mu, sqrt(sig2))
+X <- matrix(1,110,1)
+Y <- y

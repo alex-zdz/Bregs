@@ -48,7 +48,7 @@
 nullreg<-function(X,Y,
                   nburn,nthin,n_save,
                   prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,
-                  sig2.samp= NULL, beta.samp = NULL,
+                  sig2.samp= NULL, beta.samp = NULL,intercept = FALSE,
                   verbose=TRUE){
 
 
@@ -87,7 +87,11 @@ nullreg<-function(X,Y,
   ###########################
   ## Initial parameter values
   ###########################
-  mod.glm   <- glm(Y ~ X)
+  if(intercept){
+  mod.glm   <- glm(Y ~ -1 + X)
+  }else{
+  mod.glm   <- glm(Y ~  X)
+  }
   beta0     <- mod.glm$coefficients[1]
   beta.mean <- mod.glm$coefficients[-1]
   beta.sd <- sqrt(diag(summary(mod.glm)$cov.scaled))[-1]
