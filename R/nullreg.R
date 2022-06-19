@@ -1,3 +1,50 @@
+#' Title
+#'
+#' @param X Design matrix
+#' @param Y Respones variable
+#' @param nburn   MCMC Burnin
+#' @param nthin   MCMC Thinning
+#' @param n_save  MCMC Samples saved
+#' @param prior.mean.beta Prior mean of the regression coefficient
+#' @param prior.var.beta  Prior variance of the regression coefficient
+#' @param prior.sig2      Prior for the variance term
+#' @param sig2.samp       Starting value for sigma^2
+#' @param beta.samp       Starting value for beta
+#' @param verbose         Print progress
+#'
+#' @return                Posterior beta and sigma samples
+#' @export
+#'
+#'
+#'
+#'
+#' @examples # AR-1 model:
+#'set.seed(1234)
+#' n     = 100
+#' alpha = 0
+#' beta  = 0.9
+#' #beta  = 1.2
+#' sig   = 1
+#' z     = rep(0,n)
+#' z[1]  = alpha/(1-beta)
+#' e     = rnorm(n,0,sig)
+#' for (t in 2:n)
+#'   z[t] = alpha+beta*z[t-1]+e[t]
+#'
+#' par(mfrow=c(2,2))
+#' ts.plot(z,main="Simulated AR(1) data")
+#'
+#' Y = z[2:n]
+#' x <- z[1:(n-1)]
+#' X <- matrix(x,length(x),1)
+#' nullreg(
+#' X,Y,
+#' nburn = 0 ,nthin = 1,n_save = 1e3,
+#' prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,
+#' sig2.samp= NULL, beta.samp = NULL,
+#' verbose=TRUE
+#' )
+#'
 nullreg<-function(X,Y,
                   nburn,nthin,n_save,
                   prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,

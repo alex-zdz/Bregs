@@ -35,3 +35,10 @@ nburn = 0 ;nthin = 1;n_save = 1e3;
 prior.mean.beta=NULL; prior.var.beta=NULL; prior.sig2=NULL;
 sig2.samp= NULL; beta.samp = NULL;
 verbose=TRUE
+
+
+
+
+#@import
+#'importFrom("stats", "glm", "rgamma", "rnorm", "sd")
+#'importFrom("utils", "txtProgressBar")
