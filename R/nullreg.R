@@ -1,11 +1,13 @@
 nullreg<-function(X,Y,
                   nburn,nthin,n_save,
                   prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,
-                  sig2.samp= NULL, beta.samp = NULL){
+                  sig2.samp= NULL, beta.samp = NULL,
+                  verbose=TRUE){
 
 
 
   ## extract dimensions from design matrix
+  #need to include check if X already includes an intercept
 
   if(length(dim(X)) == 3){
     stop("Not yet implemented for panel data", call.=FALSE)
@@ -17,20 +19,22 @@ nullreg<-function(X,Y,
     p<-dim(X)[2]
   }
 
+
   ## Number of MCMC iterations
-  niter <-  nburn+ nthin*n_save
+  n_sample <-  nburn+ nthin*n_save
 
   #### Priors
   if(is.null(prior.mean.beta)) prior.mean.beta <- rep(0, p)
   if(is.null(prior.var.beta))  prior.var.beta  <- diag(rep(1, p))
   if(is.null(prior.sig2)) prior.sig2 <- c(1, 0.01)
 
-  data.precision.beta <- crossprod(X.standardised)
+  data.precision.beta <- crossprod(X)
   if(length(prior.var.beta)==1){
     prior.precision.beta <- 1 / prior.var.beta
   }else{
     prior.precision.beta <- diag(1/prior.var.beta)
   }
+
 
 
   ###########################
@@ -58,7 +62,7 @@ nullreg<-function(X,Y,
   ## pre-calculated values:
   ###########################
   pre1 <- crossprod(X) + prior.precision.beta
-  pre2 <- crossprod(X, Y) + prior.precision.beta %*% prior.mean.beta
+  pre2 <- crossprod(X, Y) #+ prior.precision.beta %*% prior.mean.beta
   pre3 <- prior.sig2[1] + I/2 + p/2
 
   ###########################
@@ -66,11 +70,11 @@ nullreg<-function(X,Y,
   ###########################
   ## Start timer
   if(verbose) {
-    cat("Generating", n.keep, "post burnin and thinned (if requested) samples.\n", sep = " ")
+    cat("Generating", n_save, "post burnin and thinned (if requested) samples.\n", sep = " ")
     progressBar <- txtProgressBar(style = 3)
-    percentage.points<-round((1:100/100)*n.sample)
+    percentage.points<-round((1:100/100)*n_sample)
   } else {
-    percentage.points<-round((1:100/100)*n.sample)
+    percentage.points<-round((1:100/100)*n_sample)
   }
 
 
@@ -78,7 +82,7 @@ nullreg<-function(X,Y,
   ## Start Gibbs
   ###########################
 
-  for (iter in 1:niter){
+  for (iter in 1:n_sample){
 
   # Sample beta:
   Sigma <- solve(pre1/sig2.samp)
@@ -86,8 +90,8 @@ nullreg<-function(X,Y,
   beta.samp <- mvtnorm::rmvnorm(1, mu, Sigma)
 
   # Sample sigma^2:
-  tmp <- C0 + .5*(crossprod(y - X%*%beta.samp) +
-                    t(beta.samp-b0) %*% B0inv %*% (beta.samp-b0))
+  tmp <- prior.sig2[2] + .5*(crossprod(y - X%*%beta.samp) +
+                    t(beta.samp-prior.mean.beta) %*% prior.precision.beta %*% (beta.samp-prior.mean.beta))
   sig2.samp <- 1/rgamma(1, pre3, rate=tmp)
 
 
