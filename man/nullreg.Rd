@@ -15,6 +15,7 @@ nullreg(
   prior.sig2 = NULL,
   sig2.samp = NULL,
   beta.samp = NULL,
+  intercept = FALSE,
   verbose = TRUE
 )
 }

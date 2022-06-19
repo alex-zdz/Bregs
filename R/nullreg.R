@@ -10,6 +10,7 @@
 #' @param prior.sig2      Prior for the variance term
 #' @param sig2.samp       Starting value for sigma^2
 #' @param beta.samp       Starting value for beta
+#' @param intercept       Is an intercept included in the design matrix X
 #' @param verbose         Print progress
 #'
 #' @return                Posterior beta and sigma samples
