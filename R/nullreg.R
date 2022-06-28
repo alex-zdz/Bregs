@@ -19,33 +19,8 @@
 #'
 #'
 #'
-#' @examples # AR-1 model:
-#'set.seed(1234)
-#' n     = 100
-#' alpha = 0
-#' beta  = 0.9
-#' #beta  = 1.2
-#' sig   = 1
-#' z     = rep(0,n)
-#' z[1]  = alpha/(1-beta)
-#' e     = rnorm(n,0,sig)
-#' for (t in 2:n)
-#'   z[t] = alpha+beta*z[t-1]+e[t]
-#'
-#' par(mfrow=c(2,2))
-#' ts.plot(z,main="Simulated AR(1) data")
-#'
-#' Y = z[2:n]
-#' x <- z[1:(n-1)]
-#' X <- matrix(x,length(x),1)
-#' nullreg(
-#' X,Y,
-#' nburn = 0 ,nthin = 1,n_save = 1e3,
-#' prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,
-#' sig2.samp= NULL, beta.samp = NULL,
-#' verbose=TRUE
-#' )
-#'
+#' @examples
+
 nullreg<-function(X,Y,
                   nburn,nthin,n_save,
                   prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,
@@ -88,6 +63,8 @@ nullreg<-function(X,Y,
   ###########################
   ## Initial parameter values
   ###########################
+  if(is.null(beta.samp)& is.null(sig2.samp)){
+
   if(intercept){
   mod.glm   <- glm(Y ~ -1 + X)
   }else{
@@ -102,6 +79,11 @@ nullreg<-function(X,Y,
   res.sd <- sd(res.temp, na.rm=TRUE)
   sig2.samp <- res.sd/2
 
+  }
+
+  if((is.null(beta.samp)& !is.null(sig2.samp)) | (!is.null(beta.samp)& is.null(sig2.samp))){
+    stop("Please provide starting values for both beta and sigma^2 or for neither",call. = FALSE)
+  }
 
   ###########################
   ## Results storage
@@ -140,8 +122,11 @@ nullreg<-function(X,Y,
   Sigma <- solve(pre1/sig2.samp)
   mu <- Sigma %*% (pre2/sig2.samp)
   beta.samp <- mvtnorm::rmvnorm(1, mu, Sigma)
-
-  # Sample sigma^2:
+  # print("beta sampling sucessful")
+  # # Sample sigma^2:
+  print(paste0(c(dim(X),dim(y), length(beta.samp) )))
+  print(paste0( "beta.samp", beta.samp))
+  print(paste0(y - X%*%beta.samp))
   tmp <- prior.sig2[2] + .5*(crossprod(y - X%*%beta.samp) +
                     t(beta.samp-prior.mean.beta) %*% prior.precision.beta %*% (beta.samp-prior.mean.beta))
   sig2.samp <- 1/rgamma(1, pre3, rate=tmp)
