@@ -40,6 +40,8 @@ nullreg(
 
 \item{beta.samp}{Starting value for beta}
 
+\item{intercept}{Is an intercept included in the design matrix X}
+
 \item{verbose}{Print progress}
 }
 \value{
@@ -48,33 +50,4 @@ nullreg(
 }
 \description{
 Title
-}
-\examples{
-# AR-1 model:
-set.seed(1234)
-n     = 100
-alpha = 0
-beta  = 0.9
-#beta  = 1.2
-sig   = 1
-z     = rep(0,n)
-z[1]  = alpha/(1-beta)
-e     = rnorm(n,0,sig)
-for (t in 2:n)
-  z[t] = alpha+beta*z[t-1]+e[t]
-
-par(mfrow=c(2,2))
-ts.plot(z,main="Simulated AR(1) data")
-
-Y = z[2:n]
-x <- z[1:(n-1)]
-X <- matrix(x,length(x),1)
-nullreg(
-X,Y,
-nburn = 0 ,nthin = 1,n_save = 1e3,
-prior.mean.beta=NULL, prior.var.beta=NULL, prior.sig2=NULL,
-sig2.samp= NULL, beta.samp = NULL,
-verbose=TRUE
-)
-
 }
