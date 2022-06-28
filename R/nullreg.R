@@ -124,9 +124,9 @@ nullreg<-function(X,Y,
   beta.samp <- mvtnorm::rmvnorm(1, mu, Sigma)
   # print("beta sampling sucessful")
   # # Sample sigma^2:
-  print(paste0(c(dim(X),dim(y), length(beta.samp) )))
-  print(paste0( "beta.samp", beta.samp))
-  print(paste0(y - X%*%beta.samp))
+  #print(paste0(c(dim(X),dim(y), length(beta.samp) )))
+  #print(paste0( "beta.samp", beta.samp))
+  #print(paste0(y - X%*%beta.samp))
   tmp <- prior.sig2[2] + .5*(crossprod(y - X%*%beta.samp) +
                     t(beta.samp-prior.mean.beta) %*% prior.precision.beta %*% (beta.samp-prior.mean.beta))
   sig2.samp <- 1/rgamma(1, pre3, rate=tmp)
